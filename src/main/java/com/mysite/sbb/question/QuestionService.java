@@ -28,6 +28,7 @@ public class QuestionService {
 		}
 	}
 
+	//질문 저장
 	public void create(String subject, String content) {
 		Question q = new Question();
 		q.setSubject(subject);
