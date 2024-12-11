@@ -13,6 +13,7 @@ public class AnswerService {
 	private final AnswerRepository answerRepository;
 
 
+	//답변을 저장
 	public void create(Question question, String content) {
 		Answer answer = new Answer();
 		answer.setContent(content);
