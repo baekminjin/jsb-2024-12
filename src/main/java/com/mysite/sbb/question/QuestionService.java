@@ -3,6 +3,9 @@ package com.mysite.sbb.question;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -35,5 +38,10 @@ public class QuestionService {
 		q.setContent(content);
 		q.setCreateDate(LocalDateTime.now());
 		this.questionRepository.save(q);
+	}
+
+	public Page<Question> getList(int page) {
+		Pageable pageable = PageRequest.of(page, 10);
+		return this.questionRepository.findAll(pageable);
 	}
 }
