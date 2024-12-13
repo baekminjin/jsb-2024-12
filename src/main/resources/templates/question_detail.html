@@ -17,6 +17,7 @@
     <!-- 답변의 갯수 표시 -->
     <h5 class="border-bottom my-3 py-2"
         th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
+                <!-- 질문 객체가 가진 답변들 -->
 
     <!-- 답변 반복 시작 / 반복문-->
     <div class="card my-3" th:each="answer : ${question.answerList}">
