@@ -23,9 +23,7 @@ public class QuestionService {
 
 	private final QuestionRepository questionRepository;
 
-	public List<Question> getList() {
-		return this.questionRepository.findAll();
-	}
+
 
 	public Question getQuestion(Integer id) {
 		Optional<Question> question = this.questionRepository.findById(id);
@@ -53,9 +51,16 @@ public class QuestionService {
 		this.questionRepository.save(question);
 	}
 
+	/*
+	public List<Question> getList() {
+		return this.questionRepository.findAll();
+	}
+	*/
+
 	public Page<Question> getList(int page, String kw) {
 		List<Sort.Order> sorts = new ArrayList<>();
 		sorts.add(Sort.Order.desc("createDate"));
+
 		Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
 		/*
 		Specification<Question> spec = search(kw);
@@ -64,6 +69,8 @@ public class QuestionService {
 		//리포지터리 쿼리 사용
 		return this.questionRepository.findAllByKeyword(kw, pageable);
 	}
+
+
 
 	public void delete(Question question) {
 		this.questionRepository.delete(question);

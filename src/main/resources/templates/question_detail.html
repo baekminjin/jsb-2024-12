@@ -40,10 +40,15 @@
     <!-- 답변의 갯수 표시 -->
     <h5 class="border-bottom my-3 py-2"
         th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
-                <!-- 질문 객체가 가진 답변들 -->
+
+    <!-- 답변 정렬 -->
+    <a href="javascript:void(0);" th:data-uri="@{|/question/detail/${question.id}?answer_order=recommend|}"
+       class="order btn btn-sm btn-outline-secondary" th:text="추천순"></a>
+    <a href="javascript:void(0);" th:data-uri="@{|/question/detail/${question.id}?answer_order=time|}"
+       class="order btn btn-sm btn-outline-secondary" th:text="최신순"></a>
 
     <!-- 답변 반복 시작 / 반복문-->
-    <div class="card my-3" th:each="answer : ${question.answerList}">
+    <div class="card my-3" th:each="answer : ${answer_paging}">
         <a th:id="|answer_${answer.id}|"></a>
         <div class="card-body">
             <div class="card-text" th:utext="${@commonUtil.markdown(answer.content)}"></div>
@@ -78,6 +83,29 @@
     </div>
     <!-- 답변 반복 끝  -->
 
+    <!-- 답변 페이징 처리 시작 -->
+    <div th:if="${!answer_paging.isEmpty()}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${!answer_paging.hasPrevious} ? 'disabled'">
+                <a class="page-link" th:href="@{|?answer_page=${answer_paging.number-1}|}" th:data-page="${answer_paging.number-1}">
+                    <span>이전</span>
+                </a>
+            </li>
+            <li th:each="page: ${#numbers.sequence(0, answer_paging.totalPages-1)}"
+                th:if="${page >= answer_paging.number - 5 and page <= answer_paging.number+5}"
+                th:classappend="${page == answer_paging.number} ? 'active'"
+                class="page-item">
+                <a th:text="${page}" class="page-link" th:href="@{|?answer_page=${page}|}" th:data-page="${page}"></a>
+            </li>
+            <li class="page-item" th:classappend="${!answer_paging.hasNext()} ? 'disabled'">
+                <a class="page-link" th:href="@{|?answer_page=${answer_paging.number+1}|}" th:data-page="${answer_paging.number+1}">
+                    <span>다음</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- 페이징처리 끝 -->
+
     <!-- 답변 작성 -->
     <form th:action="@{|/answer/create/${question.id}|}"  th:object="${answerForm}" method="post" class="my-3">
         <div th:replace="~{form_errors :: formErrorsFragment}"></div>
@@ -101,6 +129,12 @@ Array.from(recommend_elements).forEach(function(element) {
         if(confirm("정말로 추천하시겠습니까?")) {
             location.href = this.dataset.uri;
         };
+    });
+});
+const ordering_elements = document.getElementsByClassName("ordering");
+Array.from(ordering_elements).forEach(function(element) {
+    element.addEventListener('click', function() {
+        location.href = this.dataset.uri;
     });
 });
 </script>

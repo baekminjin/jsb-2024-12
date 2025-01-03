@@ -1,12 +1,12 @@
 package com.mysite.sbb.question;
 
-import java.security.Principal;
-
-
+import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.answer.AnswerForm;
+import com.mysite.sbb.answer.AnswerService;
 import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.user.UserService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,8 +14,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.security.Principal;
 
 
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class QuestionController {
 
 	private final QuestionService questionService;
 	private final UserService userService;
+	private final AnswerService answerService;
 
 	@GetMapping("/list")
 	public String list(Model model, @RequestParam(value="page", defaultValue="0") int page,  @RequestParam(value = "kw", defaultValue = "") String kw) {
@@ -35,11 +37,18 @@ public class QuestionController {
 	}
 
 	@GetMapping(value = "/detail/{id}")
-	public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm) {
+	public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm,
+						 @RequestParam(value="answer_page", defaultValue="0") int answerPage,
+						 @RequestParam(value="answer_order", defaultValue="time") String AnswerOrder) {
 		Question question = this.questionService.getQuestion(id);
+		Page<Answer> answerPaging = this.answerService.getAnswerList(question,
+				answerPage, AnswerOrder);
 		model.addAttribute("question", question);
+		model.addAttribute("answer_paging", answerPaging);
 		return "question_detail";
 	}
+
+
 
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/create")
@@ -67,6 +76,7 @@ public class QuestionController {
 		if(!question.getAuthor().getUsername().equals(principal.getName())) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
 		}
+		// 저장된 기존의 제목과 내용을 표시
 		questionForm.setSubject(question.getSubject());
 		questionForm.setContent(question.getContent());
 		return "question_form";
