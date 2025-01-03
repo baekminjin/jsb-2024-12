@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+import com.mysite.sbb.comment.Comment;
 import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.user.SiteUser;
 import jakarta.persistence.*;
@@ -37,4 +38,7 @@ public class Question {
 
 	@ManyToMany
 	Set<SiteUser> voter;
+
+	@OneToMany(mappedBy = "question")
+	private List<Comment> commentList;
 }
